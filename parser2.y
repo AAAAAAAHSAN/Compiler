@@ -1,3 +1,5 @@
+/* compiler project CSE 7th semester, University of Chittagong*/
+/* MD. AHASAN ULLAH*/
 %{
     #include "symtab.c"
     #include <stdio.h>
