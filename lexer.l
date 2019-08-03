@@ -1,5 +1,5 @@
 /* compiler project CSE 7th semester, University of Chittagong*/
-/* MD. AHASAN ULLAH*/
+/* */
 %{
 #include <stdio.h>
 #include "parser.tab.h"
