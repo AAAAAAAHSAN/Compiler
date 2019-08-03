@@ -1,13 +1,12 @@
 /* compiler project CSE 7th semester, University of Chittagong*/
-/* MD. AHASAN ULLAH*/
 %{
 #include <stdio.h>
 int yylex();
-void yyerror(char *s);
+void yyerror(char *s, ...);
 extern int yylineno;
 extern int yylex();
 extern char *yytext;
-extern FILE *yyin;
+
 %}
 
 /*declare tokens*/
@@ -37,7 +36,7 @@ program: stmts {printf("Program runned successfully.\n");}
 ;
 
 stmts: stmt
- | stmts stmt
+ | stmt stmts 
 ;
 
 stmt: var_decl
@@ -83,19 +82,28 @@ call_args: expr
  | call_args COMMA expr
 ;
 
-expr: EOL 
+expr: EOL
  | ID ASSIGN expr
  | ID OPEN_PARENTHESES call_args CLOSE_PARENTHESES
- | OPEN_PARENTHESES call_args CLOSE_PARENTHESES
- | ID
- | expr MOD expr
- | expr MUL expr
- | expr DIV expr
- | expr ADD expr
- | expr SUB expr
- | expr comparison expr
  | OPEN_PARENTHESES expr CLOSE_PARENTHESES
- | numeric
+ | OPEN_PARENTHESES call_args CLOSE_PARENTHESES
+ | expr_arithmetic
+;
+
+expr_arithmetic: expr_arithmetic ADD term
+ | expr_arithmetic SUB term
+ | expr_arithmetic comparison term
+ | term
+;
+
+term: term MOD factor
+ | term MUL factor
+ | term DIV factor
+ | factor
+;
+
+factor: ID
+ | numeric 
 ;
 
 numeric: INT_DATATYPE
@@ -112,7 +120,8 @@ comparison: EQUAL
 
 %% 
 
-int main(int argc, int **argv) {
+int main(int argc, char **argv) {
+    extern FILE *yyin;
     if(argc > 1) {
         yyin = fopen(argv[1], "r");
         if(yyin == 0)
@@ -125,6 +134,11 @@ int main(int argc, int **argv) {
     return 0;
 }
 
-void yyerror(char *s) {
-    fprintf(stderr, "error: %s in line %d before or after %s\n", s, yylineno, yytext);
+void yyerror(char *s, ...) {
+    fprintf(stderr, "%d: error: ", yylineno);
+    fprintf(stderr, "after %s\n", yytext-4);
 }
+
+// void yyerror(char *s) {
+//     fprintf(stderr, "error: %s in line %d after:\n %s\n", s, yylineno, yytext-4);
+// }
